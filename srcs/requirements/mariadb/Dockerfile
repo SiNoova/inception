@@ -1,7 +1,7 @@
-FROM debian:bullseye
+FROM debian:bookworm
 
-RUN apt update && apt upgrade -y && apt install mariadb-server -y
+COPY ./tools/populateDb.sh /bin
 
-COPY ./tools .
+RUN chmod +x /bin/populateDb.sh && apt update && apt upgrade -y && apt install mariadb-server netcat-traditional -y
 
-ENTRYPOINT ["echo", ""]
+ENTRYPOINT ["populateDb.sh"]

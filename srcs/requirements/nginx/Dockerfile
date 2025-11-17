@@ -1,9 +1,15 @@
-FROM debian:bullseye
+FROM debian:bookworm
 
-RUN apt update && apt upgrade -y && apt install nginx curl openssl -y
+RUN	apt update && apt upgrade -y && apt install nginx openssl -y
 
-COPY ./tools/setup_nginx.sh setup_nginx.sh
+RUN mkdir /etc/nginx/ssl
 
-RUN chmod +x setup_nginx.sh && ./setup_nginx.sh
+RUN openssl req -x509 -nodes -newkey rsa:2048 \	
+	-keyout /etc/nginx/ssl/akoutatekey.key \	
+	-out /etc/nginx/ssl/akoutatecert.crt \	
+	-days 7 \	
+	-subj "/C=MA/ST=BK/L=Khouribga/O=1337/CN=akoutate.42.fr"
 
-EXPOSE 443
+COPY ./conf/nginx.conf /etc/nginx/nginx.conf
+
+ENTRYPOINT [ "nginx", "-g", "daemon off;" ]

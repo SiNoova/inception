@@ -1,0 +1,80 @@
+
+
+
+services:
+  nginx:
+    image: nginx:alae
+    build: ./requirements/nginx
+    container_name: nginx
+    volumes:
+      - wordpress:/var/www/html
+    ports:
+      - 443:443
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    restart: always
+    networks:
+      - alae
+
+  mariadb:
+    image: mariadb:alae
+    build: ./requirements/mariadb
+    container_name: mariadb
+    env_file:
+      - .env
+    volumes:
+      - mariadb:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "3306"]
+      interval: 10s
+      timeout: 30s
+      retries: 30
+      start_period: 30s
+    restart: always
+    networks:
+      - alae
+
+  wordpress:
+    image: wordpress:alae
+    build: ./requirements/wordpress
+    container_name: wordpress
+    env_file:
+      - .env
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    volumes:
+      - wordpress:/var/www/html
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9000"]
+      interval: 10s
+      timeout: 30s
+      retries: 20
+      start_period: 30s
+    restart: always
+    networks:
+      - alae
+
+
+
+volumes:
+  mariadb:
+    name: mariadb
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/akoutate/data/mariadb
+  wordpress:
+    name: wordpress
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/akoutate/data/wordpress
+
+networks:
+  alae:
+    name: alae
+  
