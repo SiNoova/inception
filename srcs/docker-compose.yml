@@ -1,9 +1,6 @@
-
-
-
 services:
   nginx:
-    image: nginx:alae
+    image: nginx:akoutate
     build: ./requirements/nginx
     container_name: nginx
     volumes:
@@ -15,10 +12,10 @@ services:
         condition: service_healthy
     restart: always
     networks:
-      - alae
+      - inception-network
 
   mariadb:
-    image: mariadb:alae
+    image: mariadb:akoutate
     build: ./requirements/mariadb
     container_name: mariadb
     env_file:
@@ -33,10 +30,10 @@ services:
       start_period: 30s
     restart: always
     networks:
-      - alae
+      - inception-network
 
   wordpress:
-    image: wordpress:alae
+    image: wordpress:akoutate
     build: ./requirements/wordpress
     container_name: wordpress
     env_file:
@@ -54,7 +51,7 @@ services:
       start_period: 30s
     restart: always
     networks:
-      - alae
+      - inception-network
 
 
 
@@ -75,6 +72,6 @@ volumes:
       device: /home/akoutate/data/wordpress
 
 networks:
-  alae:
-    name: alae
+  inception-network:
+    name: inception-network
   
